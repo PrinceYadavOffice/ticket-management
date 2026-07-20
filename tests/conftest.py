@@ -1,9 +1,8 @@
-"""Shared pytest fixtures."""
+"""Shared pytest fixtures — isolated file-based SQLite test database per test."""
 
 import sys
 from pathlib import Path
 
-# Ensure src/backend is on PYTHONPATH when running tests from repo root
 _BACKEND = Path(__file__).resolve().parents[1] / "src" / "backend"
 if str(_BACKEND) not in sys.path:
     sys.path.insert(0, str(_BACKEND))
@@ -12,23 +11,27 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy.pool import StaticPool
 
 from app.core.database import Base, get_db
 from app.main import app
-from app.models import Comment, Ticket, User
+from app.models import User
 
 
 @pytest.fixture
-def db_engine():
+def test_db_path(tmp_path):
+    """Separate SQLite file per test — never touches data/tickets.db."""
+    return tmp_path / "pytest_tickets.db"
+
+
+@pytest.fixture
+def db_engine(test_db_path):
     engine = create_engine(
-        "sqlite://",
+        f"sqlite:///{test_db_path}",
         connect_args={"check_same_thread": False},
-        poolclass=StaticPool,
     )
     Base.metadata.create_all(bind=engine)
     yield engine
-    Base.metadata.drop_all(bind=engine)
+    engine.dispose()
 
 
 @pytest.fixture
@@ -48,8 +51,8 @@ def seeded_users(db_session):
     ]
     db_session.add_all(users)
     db_session.commit()
-    for u in users:
-        db_session.refresh(u)
+    for user in users:
+        db_session.refresh(user)
     return users
 
 
@@ -78,20 +81,20 @@ def bob(seeded_users):
 
 
 @pytest.fixture
-def sample_ticket(db_session, alice, bob):
-    from datetime import datetime, timezone
+def carol(seeded_users):
+    return seeded_users[2]
 
-    ticket = Ticket(
+
+@pytest.fixture
+def sample_ticket(db_session, alice, bob):
+    from tests.helpers import add_ticket_row
+
+    return add_ticket_row(
+        db_session,
         title="Test ticket",
         description="Test description",
         priority="High",
         status="Open",
-        assigned_to_user_id=bob.id,
         created_by_user_id=alice.id,
-        created_at=datetime.now(timezone.utc),
-        updated_at=datetime.now(timezone.utc),
+        assigned_to_user_id=bob.id,
     )
-    db_session.add(ticket)
-    db_session.commit()
-    db_session.refresh(ticket)
-    return ticket

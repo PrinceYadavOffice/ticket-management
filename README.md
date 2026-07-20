@@ -54,6 +54,8 @@ curl -H "X-User-Id: 1" http://localhost:8000/api/tickets/export.csv
 cd src/backend && source .venv/bin/activate && pytest ../../tests -v
 ```
 
+65 tests use an isolated SQLite file per test (`tmp_path/pytest_tickets.db`) — production `data/tickets.db` is never touched.
+
 ### Frontend (scaffold)
 
 ```bash
@@ -96,7 +98,7 @@ Full specification: [api-contract.md](./api-contract.md)
 | Backend API | **Complete** (Core) |
 | Database + migrations | **Complete** |
 | Seed script | **Complete** |
-| Backend tests | **40 passing** |
+| Backend tests | **65 passing** |
 | Frontend UI | Scaffold only (M5) |
 
 ## Documentation
