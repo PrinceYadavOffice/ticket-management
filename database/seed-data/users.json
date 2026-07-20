@@ -1,17 +1,22 @@
 [
   {
-    "name": "Alice Agent",
-    "email": "alice@example.com",
+    "name": "Alice Chen",
+    "email": "alice.chen@supportdesk.example",
     "role": "Agent"
   },
   {
-    "name": "Bob Admin",
-    "email": "bob@example.com",
+    "name": "Bob Martinez",
+    "email": "bob.martinez@supportdesk.example",
     "role": "Admin"
   },
   {
-    "name": "Carol Agent",
-    "email": "carol@example.com",
+    "name": "Carol Okonkwo",
+    "email": "carol.okonkwo@supportdesk.example",
+    "role": "Agent"
+  },
+  {
+    "name": "David Kim",
+    "email": "david.kim@supportdesk.example",
     "role": "Agent"
   }
 ]

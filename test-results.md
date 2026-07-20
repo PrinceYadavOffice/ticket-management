@@ -1,41 +1,36 @@
 # Test Results
 
-> Record test run outcomes here as implementation progresses.
-
 ## Latest Run
 
 | Field | Value |
 |-------|-------|
-| Date | `[RUN_DATE]` |
-| Commit / Branch | `[COMMIT_OR_BRANCH]` |
-| Runner | `[CANDIDATE_NAME or CI]` |
+| Date | 2026-07-20 |
+| Commit / Branch | `[BRANCH_NAME]` |
+| Runner | Core backend implementation |
 
 ### Backend (Pytest)
 
 ```
-Status: NOT RUN (scaffold only)
+Status: PASSED
 
 # Command:
-# cd src/backend && pytest ../../tests -v
+cd src/backend && source .venv/bin/activate && pytest ../../tests -q
 ```
 
 | Suite | Passed | Failed | Skipped |
 |-------|--------|--------|---------|
-| `tests/backend/` | — | — | — |
-| `tests/integration/` | — | — | — |
+| `tests/backend/` | 30 | 0 | 0 |
+| `tests/integration/` | 10 | 0 | 0 |
+| **Total** | **40** | **0** | **0** |
 
 ### Frontend (Vitest)
 
 ```
-Status: NOT RUN (scaffold only)
+Status: NOT RUN (backend-only session)
 
 # Command:
-# cd src/frontend && npm test
+cd src/frontend && npm test
 ```
-
-| Suite | Passed | Failed | Skipped |
-|-------|--------|--------|---------|
-| Component tests | — | — | — |
 
 ---
 
@@ -43,4 +38,5 @@ Status: NOT RUN (scaffold only)
 
 | Date | Backend | Frontend | Notes |
 |------|---------|----------|-------|
-| 2026-07-18 | N/A | N/A | Initial scaffold; no feature tests yet |
+| 2026-07-18 | N/A | 2 passed | Initial scaffold |
+| 2026-07-20 | 40 passed | N/A | Core backend complete |

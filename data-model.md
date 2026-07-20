@@ -1,14 +1,14 @@
 # Data Model
 
-**Version:** 1.0  
+**Version:** 1.1  
 **Last Updated:** 2026-07-20  
-**Status:** Design complete — ready for M1 implementation
+**Status:** Implemented — matches `alembic/versions/001_initial.py`
 
 ---
 
 ## 1. Overview
 
-Three tables: `users`, `tickets`, `comments`. SQLite database file at `data/tickets.db` (gitignored). Schema managed by Alembic in `src/backend/alembic/versions/`.
+Three tables: `users`, `tickets`, `comments`. SQLite database at `data/tickets.db`. Managed by Alembic in `src/backend/alembic/versions/`.
 
 ---
 
@@ -16,10 +16,10 @@ Three tables: `users`, `tickets`, `comments`. SQLite database file at `data/tick
 
 ```mermaid
 erDiagram
-    users ||--o{ tickets : "creates (created_by_user_id)"
-    users ||--o{ tickets : "assigned (assigned_to_user_id)"
-    users ||--o{ comments : "authors (created_by_user_id)"
-    tickets ||--o{ comments : "has (ticket_id)"
+    users ||--o{ tickets : "created_by_user_id"
+    users ||--o{ tickets : "assigned_to_user_id"
+    users ||--o{ comments : "created_by_user_id"
+    tickets ||--o{ comments : "ticket_id"
 
     users {
         integer id PK
@@ -53,16 +53,11 @@ erDiagram
 
 ## 3. Enumerations
 
-Stored as `VARCHAR` in SQLite; enforced in application layer (Pydantic + SQLAlchemy `CheckConstraint` optional).
+Enforced in Pydantic schemas and application services.
 
 ### TicketPriority
 
-| Value |
-|-------|
-| `Low` |
-| `Medium` |
-| `High` |
-| `Critical` |
+`Low` | `Medium` | `High` | `Critical`
 
 ### TicketStatus
 
@@ -74,183 +69,100 @@ Stored as `VARCHAR` in SQLite; enforced in application layer (Pydantic + SQLAlch
 | `Closed` | Terminal |
 | `Cancelled` | Terminal |
 
-### UserRole (informational in Core)
+### UserRole
 
-| Value |
-|-------|
-| `Agent` |
-| `Admin` |
+`Agent` | `Admin` (informational in Core)
 
 ---
 
 ## 4. Table: `users`
 
-Seeded only — no application CRUD in Core.
+Seeded only — no CRUD API in Core.
 
-| Column | SQL Type | Constraints | Description |
-|--------|----------|-------------|-------------|
-| `id` | INTEGER | PRIMARY KEY AUTOINCREMENT | Surrogate key |
-| `name` | VARCHAR(100) | NOT NULL | Display name |
-| `email` | VARCHAR(255) | NOT NULL, UNIQUE | Login identifier (unused in Core) |
-| `role` | VARCHAR(50) | NOT NULL | `Agent` or `Admin` |
+| Column | Type | Constraints |
+|--------|------|-------------|
+| `id` | INTEGER | PK, autoincrement |
+| `name` | VARCHAR(100) | NOT NULL |
+| `email` | VARCHAR(255) | NOT NULL, UNIQUE |
+| `role` | VARCHAR(50) | NOT NULL |
 
-**Indexes:** unique on `email` (automatic with UNIQUE constraint).
-
-**Seed source:** `database/seed-data/users.json`
+**Seed file:** `database/seed-data/users.json` (4 fictional users)
 
 ---
 
 ## 5. Table: `tickets`
 
-| Column | SQL Type | Constraints | Description |
-|--------|----------|-------------|-------------|
-| `id` | INTEGER | PRIMARY KEY AUTOINCREMENT | |
-| `title` | VARCHAR(200) | NOT NULL | Short summary |
-| `description` | TEXT | NOT NULL | Full details |
-| `priority` | VARCHAR(20) | NOT NULL | See TicketPriority |
-| `status` | VARCHAR(20) | NOT NULL, DEFAULT `'Open'` | See TicketStatus |
-| `assigned_to_user_id` | INTEGER | NULL, FK → `users.id` | Nullable assignee |
-| `created_by_user_id` | INTEGER | NOT NULL, FK → `users.id` | Ticket creator |
-| `created_at` | DATETIME | NOT NULL | UTC, set on insert |
-| `updated_at` | DATETIME | NOT NULL | UTC, set on insert/update |
+| Column | Type | Constraints |
+|--------|------|-------------|
+| `id` | INTEGER | PK, autoincrement |
+| `title` | VARCHAR(200) | NOT NULL |
+| `description` | TEXT | NOT NULL |
+| `priority` | VARCHAR(20) | NOT NULL |
+| `status` | VARCHAR(20) | NOT NULL, default `Open` |
+| `assigned_to_user_id` | INTEGER | FK → `users.id`, NULLABLE, indexed |
+| `created_by_user_id` | INTEGER | FK → `users.id`, NOT NULL, indexed |
+| `created_at` | DATETIME(tz) | NOT NULL |
+| `updated_at` | DATETIME(tz) | NOT NULL |
 
-### Foreign keys
+**Business rules:**
 
-```sql
-FOREIGN KEY (assigned_to_user_id) REFERENCES users(id)
-FOREIGN KEY (created_by_user_id) REFERENCES users(id)
-```
-
-### Indexes
-
-| Name | Column(s) | Purpose |
-|------|-----------|---------|
-| `ix_tickets_status` | `status` | Filter by status |
-| `ix_tickets_priority` | `priority` | Filter by priority |
-| `ix_tickets_created_by_user_id` | `created_by_user_id` | CSV export, filter |
-| `ix_tickets_assigned_to_user_id` | `assigned_to_user_id` | Filter by assignee |
-| `ix_tickets_updated_at` | `updated_at` | Default sort |
+- `status` changes only via `services/status_machine.py`
+- `updated_at` set on field updates and status transitions
+- Comments do not update ticket `updated_at`
 
 ---
 
 ## 6. Table: `comments`
 
-| Column | SQL Type | Constraints | Description |
-|--------|----------|-------------|-------------|
-| `id` | INTEGER | PRIMARY KEY AUTOINCREMENT | |
-| `ticket_id` | INTEGER | NOT NULL, FK → `tickets.id` ON DELETE CASCADE | Parent ticket |
-| `message` | TEXT | NOT NULL | 1–2000 chars (app validation) |
-| `created_by_user_id` | INTEGER | NOT NULL, FK → `users.id` | Comment author |
-| `created_at` | DATETIME | NOT NULL | UTC, set on insert |
+| Column | Type | Constraints |
+|--------|------|-------------|
+| `id` | INTEGER | PK, autoincrement |
+| `ticket_id` | INTEGER | FK → `tickets.id` ON DELETE CASCADE, indexed |
+| `message` | TEXT | NOT NULL (1–2000 chars, app validation) |
+| `created_by_user_id` | INTEGER | FK → `users.id`, NOT NULL |
+| `created_at` | DATETIME(tz) | NOT NULL |
 
-### Indexes
-
-| Name | Column(s) | Purpose |
-|------|-----------|---------|
-| `ix_comments_ticket_id` | `ticket_id` | Load comments for ticket detail |
+Returned in ticket detail ordered by `created_at` ascending.
 
 ---
 
-## 7. SQLAlchemy Model Sketch
+## 7. API ↔ Database Mapping
 
-```python
-# Naming: Python attributes use snake_case matching DB columns.
-# API serialization uses Pydantic aliases for camelCase.
-
-class User(Base):
-    __tablename__ = "users"
-    id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str] = mapped_column(String(100))
-    email: Mapped[str] = mapped_column(String(255), unique=True)
-    role: Mapped[str] = mapped_column(String(50))
-
-    created_tickets: Mapped[list["Ticket"]] = relationship(
-        foreign_keys="Ticket.created_by_user_id", back_populates="creator"
-    )
-    assigned_tickets: Mapped[list["Ticket"]] = relationship(
-        foreign_keys="Ticket.assigned_to_user_id", back_populates="assignee"
-    )
-
-
-class Ticket(Base):
-    __tablename__ = "tickets"
-    # ... columns as above
-    creator: Mapped["User"] = relationship(foreign_keys=[created_by_user_id])
-    assignee: Mapped["User | None"] = relationship(foreign_keys=[assigned_to_user_id])
-    comments: Mapped[list["Comment"]] = relationship(back_populates="ticket")
-
-
-class Comment(Base):
-    __tablename__ = "comments"
-    ticket: Mapped["Ticket"] = relationship(back_populates="comments")
-    author: Mapped["User"] = relationship()
-```
-
----
-
-## 8. API ↔ Database Field Mapping
-
-| API (JSON camelCase) | Database column |
-|----------------------|-----------------|
-| `id` | `id` |
-| `title` | `title` |
-| `description` | `description` |
-| `priority` | `priority` |
-| `status` | `status` |
+| API (camelCase) | Database column |
+|-----------------|-----------------|
 | `assignedTo` | `assigned_to_user_id` |
 | `createdBy` | `created_by_user_id` |
 | `createdAt` | `created_at` |
 | `updatedAt` | `updated_at` |
 | `ticketId` | `ticket_id` |
 
-Pydantic v2 config:
-
-```python
-model_config = ConfigDict(from_attributes=True, populate_by_name=True)
-# Field aliases: assignedTo = Field(alias="assignedTo", serialization_alias="assignedTo")
-```
+Pydantic schemas use `validation_alias` for ORM deserialization and `serialization_alias` for JSON output.
 
 ---
 
-## 9. Timestamp Rules
+## 8. Seed Data
 
-| Event | `created_at` | `updated_at` |
-|-------|--------------|--------------|
-| Ticket create | Set to `now(UTC)` | Set to `now(UTC)` |
-| Ticket field update | Unchanged | Set to `now(UTC)` |
-| Status transition | Unchanged | Set to `now(UTC)` |
-| Comment create | Set to `now(UTC)` | N/A |
+| File | Contents |
+|------|----------|
+| `database/seed-data/users.json` | 4 fictional users |
+| `database/seed-data/sample_data.json` | 6 tickets, 6 comments |
 
-Use `datetime.now(timezone.utc)` in services; store as naive UTC or timezone-aware per SQLAlchemy config (recommend timezone-aware).
+Run: `python -m app.scripts.seed` from `src/backend/`
 
 ---
 
-## 10. Migration Plan
+## 9. SQLAlchemy Models
 
-| Revision | Description |
-|----------|-------------|
-| `001_initial` | Create `users`, `tickets`, `comments` with FKs and indexes |
+Located in `src/backend/app/models/`:
 
-Seed users run after migration via CLI script or Alembic post-hook (idempotent: skip if emails exist).
-
----
-
-## 11. Data Integrity Rules (Application Layer)
-
-| Rule | Enforced by |
-|------|-------------|
-| `created_by_user_id` always set on ticket create | `ticket_service.create` |
-| `assigned_to_user_id` must reference existing user or be null | `ticket_service` |
-| `status` only changes via state machine | `ticket_service.transition_status` |
-| Comments require existing ticket | `comment_service.create` |
-| No ticket/comment/user delete in Core | No delete endpoints |
+- `user.py` — `User`
+- `ticket.py` — `Ticket`
+- `comment.py` — `Comment`
 
 ---
 
-## 12. Implementation Status
+## 10. Migration History
 
-| Item | Status |
-|------|--------|
-| SQLAlchemy models | Not implemented (M1) |
-| Alembic `001_initial` | Not implemented (M1) |
-| Seed script | Not implemented (M1) |
+| Revision | File | Description |
+|----------|------|-------------|
+| `001_initial` | `alembic/versions/001_initial.py` | Initial schema |

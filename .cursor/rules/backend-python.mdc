@@ -21,8 +21,9 @@ alwaysApply: false
 ## Validation
 
 - Use Pydantic for request bodies
-- Return consistent error shape: `detail`, `code`, optional `fields`
-- Status changes only via dedicated status endpoint + state machine service
+- Return consistent error shape: `{ "error": { "code", "message", "details" } }`
+- Status changes only via `PATCH /api/tickets/{id}/status` + state machine service
+- Invalid transitions return **409** `INVALID_STATUS_TRANSITION`
 
 ## Database
 

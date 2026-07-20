@@ -1,4 +1,4 @@
-"""Backend API tests — to be expanded in M2+."""
+"""Health endpoint tests."""
 
 
 def test_health_check(client):

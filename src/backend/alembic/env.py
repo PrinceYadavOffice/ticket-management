@@ -8,8 +8,8 @@ from sqlalchemy import engine_from_config, pool
 from app.core.config import settings
 from app.core.database import Base
 
-# Import models here once created:
-# from app.models import user, ticket, comment  # noqa: F401
+# Import models for Alembic autogenerate
+from app.models import Comment, Ticket, User  # noqa: F401
 
 config = context.config
 config.set_main_option("sqlalchemy.url", settings.database_url)

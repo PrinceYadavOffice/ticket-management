@@ -1,1 +1,7 @@
-"""SQLAlchemy models — to be implemented in M1."""
+"""SQLAlchemy models."""
+
+from app.models.comment import Comment
+from app.models.ticket import Ticket
+from app.models.user import User
+
+__all__ = ["User", "Ticket", "Comment"]

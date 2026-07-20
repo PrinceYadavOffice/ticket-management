@@ -1,0 +1,84 @@
+{
+  "tickets": [
+    {
+      "title": "Cannot reset password",
+      "description": "User reports password reset email never arrives. Checked spam folder.",
+      "priority": "High",
+      "status": "Open",
+      "created_by_email": "alice.chen@supportdesk.example",
+      "assigned_to_email": "bob.martinez@supportdesk.example"
+    },
+    {
+      "title": "Printer offline in Building B",
+      "description": "Shared printer shows offline since Monday morning.",
+      "priority": "Medium",
+      "status": "In Progress",
+      "created_by_email": "carol.okonkwo@supportdesk.example",
+      "assigned_to_email": "david.kim@supportdesk.example"
+    },
+    {
+      "title": "VPN disconnects every hour",
+      "description": "Remote staff lose VPN connection approximately every 60 minutes.",
+      "priority": "Critical",
+      "status": "Resolved",
+      "created_by_email": "alice.chen@supportdesk.example",
+      "assigned_to_email": "carol.okonkwo@supportdesk.example"
+    },
+    {
+      "title": "Request monitor arm",
+      "description": "Employee needs ergonomic monitor arm for dual-screen setup.",
+      "priority": "Low",
+      "status": "Closed",
+      "created_by_email": "david.kim@supportdesk.example",
+      "assigned_to_email": null
+    },
+    {
+      "title": "Duplicate invoice in billing portal",
+      "description": "Customer sees two identical invoices for March subscription.",
+      "priority": "High",
+      "status": "Cancelled",
+      "created_by_email": "bob.martinez@supportdesk.example",
+      "assigned_to_email": "alice.chen@supportdesk.example"
+    },
+    {
+      "title": "Mobile app crashes on login",
+      "description": "iOS app version 3.2 crashes immediately after entering credentials.",
+      "priority": "Critical",
+      "status": "Open",
+      "created_by_email": "alice.chen@supportdesk.example",
+      "assigned_to_email": null
+    }
+  ],
+  "comments": [
+    {
+      "ticket_title": "Cannot reset password",
+      "author_email": "bob.martinez@supportdesk.example",
+      "message": "Verified SMTP relay is accepting messages. Checking user mailbox quota."
+    },
+    {
+      "ticket_title": "Cannot reset password",
+      "author_email": "alice.chen@supportdesk.example",
+      "message": "Customer confirmed email address is correct."
+    },
+    {
+      "ticket_title": "Printer offline in Building B",
+      "author_email": "david.kim@supportdesk.example",
+      "message": "Restarted print spooler on the server. Monitoring."
+    },
+    {
+      "ticket_title": "VPN disconnects every hour",
+      "author_email": "carol.okonkwo@supportdesk.example",
+      "message": "Updated VPN client policy timeout from 60 to 480 minutes."
+    },
+    {
+      "ticket_title": "VPN disconnects every hour",
+      "author_email": "alice.chen@supportdesk.example",
+      "message": "Confirmed fix with two remote users."
+    },
+    {
+      "ticket_title": "Mobile app crashes on login",
+      "author_email": "carol.okonkwo@supportdesk.example",
+      "message": "Reproduced on iOS 17.4. Escalating to mobile team."
+    }
+  ]
+}

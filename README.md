@@ -7,39 +7,21 @@ AI-assisted full-stack project for managing support tickets with comments, statu
 | Layer | Technology |
 |-------|------------|
 | Frontend | React, TypeScript, Vite, Vitest, React Testing Library |
-| Backend | FastAPI, SQLAlchemy, Alembic |
+| Backend | FastAPI, SQLAlchemy, Alembic, Pydantic |
 | Database | SQLite |
 | Testing | Pytest (backend), Vitest + RTL (frontend) |
 
 ## Acting-User Context (Not Authentication)
 
-This project uses a **seeded current-user selector** in the frontend. The selected user's ID is sent on every API request via the `X-User-Id` header. This establishes **acting-user context** for authorization and auditing—it is **not** authentication. See [api-contract.md](./api-contract.md) and [design-notes.md](./design-notes.md) for details.
+The frontend will use a **seeded current-user selector**. The selected user's ID is sent via the `X-User-Id` header on endpoints that need acting-user context (ticket create, comment create, CSV export). This is **not** authentication.
 
-## Repository Layout
+## API Base URL
 
 ```
-├── README.md                    # This file
-├── requirements-analysis.md     # Functional & non-functional requirements
-├── acceptance-criteria.md     # Measurable acceptance criteria
-├── implementation-plan.md       # Milestones, risks, Core vs Stretch
-├── api-contract.md              # REST API specification
-├── data-model.md                # Entity definitions
-├── src/
-│   ├── backend/                 # FastAPI application
-│   └── frontend/                # React + Vite application
-├── tests/                       # Backend & integration tests
-├── database/
-│   ├── migrations/              # Migration notes & references
-│   └── seed-data/               # Seed scripts and fixtures
-├── artifacts/                   # Generated artifacts & templates
-└── ai-prompts/                  # AI session prompts by phase
+http://localhost:8000
 ```
 
-## Prerequisites
-
-- Python 3.11+
-- Node.js 20+
-- npm or pnpm
+Interactive docs: `http://localhost:8000/docs`
 
 ## Quick Start
 
@@ -47,15 +29,32 @@ This project uses a **seeded current-user selector** in the frontend. The select
 
 ```bash
 cd src/backend
-python -m venv .venv
+python3 -m venv .venv
 source .venv/bin/activate   # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
-cp ../../.env.example ../../.env
+
+# Optional: cp ../../.env.example ../../.env
 alembic upgrade head
+python -m app.scripts.seed
 uvicorn app.main:app --reload --port 8000
 ```
 
-### Frontend
+### Verify
+
+```bash
+curl http://localhost:8000/health
+curl http://localhost:8000/api/users
+curl "http://localhost:8000/api/tickets?page=1&pageSize=10"
+curl -H "X-User-Id: 1" http://localhost:8000/api/tickets/export.csv
+```
+
+### Run Backend Tests
+
+```bash
+cd src/backend && source .venv/bin/activate && pytest ../../tests -v
+```
+
+### Frontend (scaffold)
 
 ```bash
 cd src/frontend
@@ -63,34 +62,57 @@ npm install
 npm run dev
 ```
 
-### Run Tests
+## API Endpoints
 
-```bash
-# Backend
-cd src/backend && pytest ../../tests/backend ../../tests/integration -v
+| Method | Path | X-User-Id |
+|--------|------|-----------|
+| GET | `/health` | No |
+| GET | `/api/users` | No |
+| POST | `/api/tickets` | **Yes** |
+| GET | `/api/tickets` | No |
+| GET | `/api/tickets/export.csv` | **Yes** |
+| GET | `/api/tickets/{ticketId}` | No |
+| PATCH | `/api/tickets/{ticketId}` | No |
+| PATCH | `/api/tickets/{ticketId}/status` | No |
+| POST | `/api/tickets/{ticketId}/comments` | **Yes** |
 
-# Frontend
-cd src/frontend && npm test
+Full specification: [api-contract.md](./api-contract.md)
+
+## Repository Layout
+
+```
+├── src/backend/          # FastAPI app (implemented)
+├── src/frontend/         # React app (scaffold)
+├── tests/                # Pytest (40 tests)
+├── database/seed-data/   # Seed JSON files
+├── data/tickets.db       # SQLite file (gitignored, created on migrate)
+└── api-contract.md       # API specification
 ```
 
-## Planning Artifacts
+## Implementation Status
+
+| Component | Status |
+|-----------|--------|
+| Backend API | **Complete** (Core) |
+| Database + migrations | **Complete** |
+| Seed script | **Complete** |
+| Backend tests | **40 passing** |
+| Frontend UI | Scaffold only (M5) |
+
+## Documentation
 
 | Document | Purpose |
 |----------|---------|
-| [requirements-analysis.md](./requirements-analysis.md) | Requirements, assumptions, edge cases |
-| [acceptance-criteria.md](./acceptance-criteria.md) | Testable acceptance criteria |
-| [implementation-plan.md](./implementation-plan.md) | Phased delivery plan |
-| [test-strategy.md](./test-strategy.md) | Testing approach |
-| [api-contract.md](./api-contract.md) | API endpoints and contracts |
+| [api-contract.md](./api-contract.md) | REST API specification |
+| [data-model.md](./data-model.md) | Database schema |
+| [database/setup-notes.md](./database/setup-notes.md) | DB setup instructions |
+| [design-notes.md](./design-notes.md) | Architecture |
+| [ui-flow.md](./ui-flow.md) | Frontend design (not yet implemented) |
 
 ## Core vs Stretch
 
-**Core** includes all mandatory entities, features, status state machine, validation, CSV export, and integration tests for status transitions.
+**Core:** Ticket CRUD, comments, status state machine, search/filter/pagination, CSV export, backend validation.
 
-**Stretch** (out of Core scope): real authentication, role-based UI, notifications, file attachments, pagination UI polish, deployment automation.
+**Stretch:** Real authentication, role-based UI, deployment automation.
 
-See [acceptance-criteria.md](./acceptance-criteria.md) for full boundaries.
-
-## License
-
-<!-- Add license if applicable -->
+See [acceptance-criteria.md](./acceptance-criteria.md).
