@@ -1,0 +1,17 @@
+[
+  {
+    "name": "Alice Agent",
+    "email": "alice@example.com",
+    "role": "Agent"
+  },
+  {
+    "name": "Bob Admin",
+    "email": "bob@example.com",
+    "role": "Admin"
+  },
+  {
+    "name": "Carol Agent",
+    "email": "carol@example.com",
+    "role": "Agent"
+  }
+]

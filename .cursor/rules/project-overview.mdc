@@ -1,0 +1,40 @@
+---
+description: Core project context for Support Ticket Management System
+alwaysApply: true
+---
+
+# Support Ticket Management System
+
+## Stack
+
+- Frontend: React, TypeScript, Vite (`src/frontend/`)
+- Backend: FastAPI, SQLAlchemy, Alembic (`src/backend/`)
+- Database: SQLite
+- Tests: Pytest (`tests/`), Vitest + RTL (`src/frontend/`)
+
+## Acting-User Context (Not Authentication)
+
+- Users are **seeded only** — no user CRUD in Core
+- Frontend provides a user selector; API client sends `X-User-Id` header
+- This is **acting-user context**, NOT authentication — document clearly in UI and API
+
+## Status State Machine (Backend-Enforced)
+
+Allowed: Open→In Progress, In Progress→Resolved, Resolved→Closed, Open→Cancelled, In Progress→Cancelled
+
+All other transitions must be **rejected** by the backend.
+
+## Scope
+
+- **Core:** All mandatory features in `acceptance-criteria.md`
+- **Stretch:** Auth, RBAC, pagination, CI/CD — do not implement unless asked
+
+## Documentation
+
+Before API or schema changes, read: `api-contract.md`, `data-model.md`, `requirements-analysis.md`
+
+## Conventions
+
+- Minimal, focused diffs; match existing patterns
+- Backend validation on all writes; meaningful frontend errors
+- Update planning docs when behavior changes

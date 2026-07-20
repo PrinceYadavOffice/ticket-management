@@ -1,0 +1,35 @@
+---
+description: Python and FastAPI conventions for the backend
+globs: src/backend/**/*.py
+alwaysApply: false
+---
+
+# Backend Conventions
+
+## Structure
+
+- `app/models/` — SQLAlchemy models (snake_case columns)
+- `app/schemas/` — Pydantic request/response (camelCase API aliases)
+- `app/api/` — Route handlers (thin)
+- `app/services/` — Business logic (status machine, CSV export)
+
+## Acting User
+
+- Dependency: resolve `X-User-Id` header to User; reject missing/invalid
+- Set `createdBy` from acting user on ticket/comment create
+
+## Validation
+
+- Use Pydantic for request bodies
+- Return consistent error shape: `detail`, `code`, optional `fields`
+- Status changes only via dedicated status endpoint + state machine service
+
+## Database
+
+- Alembic for all schema changes
+- Do not edit applied migrations
+
+## Tests
+
+- Pytest with FastAPI TestClient
+- Integration tests for status transitions in `tests/integration/`

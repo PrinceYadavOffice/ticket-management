@@ -1,0 +1,24 @@
+---
+description: Testing requirements and patterns
+globs: tests/**/*,src/frontend/**/*.test.tsx
+alwaysApply: false
+---
+
+# Testing Rules
+
+## Backend (Pytest)
+
+- Health and API tests in `tests/backend/`
+- **Required:** Integration tests for all valid status transitions and representative invalid ones (`tests/integration/test_status_transitions.py`)
+- Use isolated DB per test (in-memory SQLite)
+
+## Frontend (Vitest + RTL)
+
+- Test user-facing behavior, not implementation details
+- Cover: user selector, error display, major views (list, detail, create)
+
+## Before Claiming Done
+
+- Run `pytest ../../tests -v` from `src/backend/`
+- Run `npm test` from `src/frontend/`
+- Update `test-results.md`

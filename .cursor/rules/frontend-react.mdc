@@ -1,0 +1,35 @@
+---
+description: React and TypeScript conventions for the frontend
+globs: src/frontend/**/*.{ts,tsx}
+alwaysApply: false
+---
+
+# Frontend Conventions
+
+## Stack
+
+- React 18 + TypeScript + Vite
+- Vitest + React Testing Library for tests
+- `VITE_API_BASE_URL` from environment
+
+## Acting-User Selector
+
+- Load users from `GET /users`
+- Store selected user ID in React context
+- API client attaches `X-User-Id` on every request
+- Show disclaimer: demo mode, not authenticated
+
+## Error Handling
+
+- Parse API error responses; display `detail` and field errors
+- Shared error display component for forms and pages
+
+## API Client
+
+- Centralize fetch logic with base URL and headers
+- Do not scatter `X-User-Id` across components
+
+## Tests
+
+- Colocate `*.test.tsx` with components or under `src/`
+- Mock API for component tests
