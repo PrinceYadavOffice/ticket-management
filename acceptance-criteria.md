@@ -126,7 +126,7 @@ Measurable criteria for declaring Core complete. Each item should be verifiable 
 | AC-91 | Integration tests cover all valid status transitions | Test file review |
 | AC-92 | Integration tests cover representative invalid transitions | Test file review |
 | AC-93 | Vitest suite passes | `npm test` |
-| AC-94 | At least one RTL test per major view (list, detail, create) | Test file review |
+| AC-94 | At least one RTL test per major view (list, detail, create) | Test file review | **Partial** — list via `TicketList.test.tsx`, detail via `TicketDetailPage.test.tsx`, create via `TicketForm.test.tsx` (no `TicketCreatePage.test.tsx`) |
 
 ---
 
@@ -149,7 +149,7 @@ All acceptance criteria **AC-01 through AC-94** above, plus:
 
 | ID | Feature | Notes |
 |----|---------|-------|
-| ST-01 | Pagination on ticket list | UI + API query params |
+| ST-01 | ~~Pagination on ticket list~~ | **Implemented in Core** — `page`/`pageSize` API + UI pagination |
 | ST-02 | Role-based permissions | Enforce Agent vs Admin |
 | ST-03 | Ticket assignment notifications | Email or toast |
 | ST-04 | Optimistic locking | `version` field on Ticket |

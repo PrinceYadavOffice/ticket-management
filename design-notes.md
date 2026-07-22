@@ -1,8 +1,8 @@
 # Design Notes
 
 **Version:** 1.0  
-**Last Updated:** 2026-07-20  
-**Status:** Design complete — ready for M1 implementation
+**Last Updated:** 2026-07-22  
+**Status:** Implemented — matches `src/backend/` and `src/frontend/`
 
 ---
 

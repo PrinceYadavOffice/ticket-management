@@ -1,19 +1,27 @@
 # Artifacts
 
-Generated outputs and session logs for the Support Ticket Management System project.
+Supporting materials for the Support Ticket Management System submission.
 
-## Contents
+## Prompt History
 
-| Path | Purpose |
-|------|---------|
-| `prompt-history/TEMPLATE.md` | Reusable template for logging AI sessions |
-| `prompt-history/*.md` | Per-session prompt history entries |
-| `local/` | Gitignored local exports (optional) |
+`prompt-history/` — per-session AI interaction logs using `TEMPLATE.md`.
 
-## Usage
+| File | Phase |
+|------|-------|
+| `2026-07-18-initial-scaffold.md` | Planning |
+| `2026-07-20-design-complete.md` | Design |
+| `2026-07-20-backend-core.md` | Backend implementation |
+| `2026-07-20-backend-tests.md` | Backend testing |
+| `2026-07-22-frontend-core.md` | Frontend implementation |
+| `2026-07-22-quality-review.md` | Code review |
+| `2026-07-22-submission-audit.md` | Documentation audit |
 
-After each significant AI-assisted session:
+## Local Outputs
 
-1. Copy `prompt-history/TEMPLATE.md` to `prompt-history/YYYY-MM-DD-description.md`
-2. Fill in metadata, prompts, verification, and follow-ups
-3. Reference entries from `final-ai-usage-summary.md`
+`artifacts/local/` — gitignored; for candidate-generated screenshots or exports during development.
+
+## Related Docs
+
+- [final-ai-usage-summary.md](../final-ai-usage-summary.md) — consolidated AI session log
+- [tool-workflow.md](../tool-workflow.md) — how Cursor was used
+- [compliance-checklist.md](../compliance-checklist.md) — requirement traceability

@@ -2,8 +2,9 @@
 
 ## Support Ticket Management System
 
-**Version:** 0.1 (Planning)  
-**Last Updated:** 2026-07-18
+**Version:** 1.0  
+**Last Updated:** 2026-07-22  
+**Status:** Implemented — all Core functional requirements delivered
 
 ---
 

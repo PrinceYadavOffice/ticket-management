@@ -2,8 +2,9 @@
 
 ## Support Ticket Management System
 
-**Version:** 0.1 (Planning)  
-**Last Updated:** 2026-07-18
+**Version:** 1.0  
+**Last Updated:** 2026-07-22  
+**Status:** Complete — all Core milestones (M0–M5) delivered; quality review applied
 
 ---
 
@@ -43,7 +44,49 @@ Deliver a working Core application that satisfies all acceptance criteria in [ac
 
 ## 3. Milestones
 
-### M0 — Repository & Planning (Current)
+### M0 — Repository & Planning
+
+**Status:** ✅ Complete (`3a7d220`)
+
+---
+
+### M1 — Data Layer & Seeding
+
+**Status:** ✅ Complete (`45c0b7e`)
+
+---
+
+### M2 — Backend API (Read Paths)
+
+**Status:** ✅ Complete (`45c0b7e`)
+
+---
+
+### M3 — Backend API (Write Paths)
+
+**Status:** ✅ Complete (`45c0b7e`)
+
+---
+
+### M4 — CSV Export & Backend Test Hardening
+
+**Status:** ✅ Complete (`20df385` — 65 tests; `1963303` — 68 tests after review)
+
+---
+
+### M5 — Frontend Core UI
+
+**Status:** ✅ Complete (`e9b5ca1` — 20 tests; `1963303` — 25 tests after review)
+
+---
+
+### M6 — Quality Review & Submission
+
+**Status:** ✅ Complete (`1963303` + documentation audit 2026-07-22)
+
+---
+
+### M0 — Repository & Planning (Original spec)
 
 **Deliverables:**
 - Directory structure, planning docs, API/data model drafts

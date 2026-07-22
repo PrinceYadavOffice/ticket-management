@@ -34,9 +34,9 @@ Full user specification: review planning docs; complete five design artifacts; d
 
 ## Human Verification
 
-- [ ] Review design docs against requirements
-- [ ] Confirm Critical priority acceptable vs requirements-analysis A-03
-- [ ] Approve before M1 implementation
+- [x] Review design docs against requirements
+- [x] Critical priority confirmed in implementation
+- [x] Approved — M1–M5 implemented
 
 ## Follow-Up
 

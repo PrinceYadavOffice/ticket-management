@@ -6,7 +6,7 @@
 |-------|-------|
 | Date | 2026-07-22 |
 | Environment | macOS, Python 3.10.14, Node.js (Vite 5) |
-| Review | Core-quality full-stack review + fixes |
+| Review | Submission documentation audit (clean verification) |
 | Backend command | `pytest tests -q` (repo root) |
 | Frontend command | `cd src/frontend && npm test && npm run build` |
 | Test database | Isolated SQLite per test (`tmp_path/pytest_tickets.db`) |
@@ -68,13 +68,18 @@ vite build — success
 | Full API error matrix (curl) | Pass (after CR-01 fix) |
 | DB persistence after restart | Pass |
 
-### Implementation defects found
+### Latest audit (2026-07-22 submission)
 
-| ID | Severity | Status |
-|----|----------|--------|
-| CR-01 PATCH → 500 on validation | High | **Fixed** |
-| CR-02 Comment text cleared on failure | High | **Fixed** |
-| CR-03 Acting user race | High | **Fixed** |
+```
+rm data/tickets.db
+pip install -r requirements.txt && npm ci
+alembic upgrade head && python -m app.scripts.seed (×2)
+pytest tests -q          → 68 passed
+npm test                 → 25 passed
+npm run build            → success
+curl health/users/tickets/export → 200
+git ls-files secrets     → none tracked
+```
 
 ---
 
@@ -87,3 +92,4 @@ vite build — success
 | 2026-07-20 (PM) | 65 passed | Not run | Comprehensive backend tests |
 | 2026-07-22 (AM) | 65 passed | 20 passed | M5 frontend complete |
 | 2026-07-22 (PM) | **68 passed** | **25 passed**, build OK | Core-quality review + fixes |
+| 2026-07-22 (audit) | **68 passed** | **25 passed**, build OK | Submission documentation audit |

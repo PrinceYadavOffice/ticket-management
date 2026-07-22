@@ -42,9 +42,9 @@ Full user specification including tech stack, entities, mandatory features, stat
 
 ## Human Verification
 
-- [ ] Reviewed generated docs for accuracy
-- [ ] Ran tests: `[pending — candidate to run after pip/npm install]`
-- [ ] Corrected AI mistakes: `[none identified yet]`
+- [x] Reviewed generated docs for accuracy
+- [x] Ran tests after implementation (see `test-results.md`)
+- [x] Corrected AI mistakes: Pydantic ORM aliases, PATCH 422 handler (2026-07-22 review)
 
 ## Artifacts Updated
 
