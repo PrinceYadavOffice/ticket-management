@@ -81,10 +81,45 @@ pytest ../../tests -q   # 40 passed
 ### Next Session (Suggested)
 
 ```
-Implement M5 — Frontend Core UI per ui-flow.md:
-- ActingUserContext + api/client.ts with X-User-Id
-- Ticket list, create, detail pages
-- Wire to /api/* endpoints
+Stretch goals: real authentication, role-based UI, deployment automation.
+```
+
+---
+
+## Session: 2026-07-22 — Core Frontend (M5)
+
+### User Request (Summary)
+
+Implement complete Core frontend per `ui-flow.md` and `api-contract.md`: ticket list, create, detail pages; acting-user selector with `localStorage`; all required components and states; focused frontend tests; run tsc/test/build.
+
+### Implemented
+
+| Area | Files |
+|------|-------|
+| API layer | `api/client.ts`, `api/types.ts`, `api/tickets.ts` |
+| Context | `context/ActingUserContext.tsx` |
+| Layout | `components/layout/AppLayout.tsx`, `components/users/ActingUserSelector.tsx` |
+| Tickets | `TicketList`, `TicketFilters`, `TicketForm`, `TicketStatusActions`, `TicketExportButton` |
+| Comments | `CommentList`, `CommentForm` |
+| Common | `ErrorAlert`, `LoadingSpinner`, `EmptyState`, `NotFoundState` |
+| Pages | `TicketListPage`, `TicketCreatePage`, `TicketDetailPage` |
+| App | `App.tsx`, `App.css`, `utils/constants.ts` |
+| Tests | 8 test files, 20 tests (Vitest + RTL) |
+
+### Key Behaviors
+
+- `X-User-Id` sent on: ticket create, comment create, CSV export (via `requireActingUser` / explicit `actingUserId`)
+- Acting user persisted in `localStorage` key `actingUserId`
+- Status buttons driven by `allowedStatusTransitions` from API; 409 errors shown without incorrect status
+- Frontend validation for required fields; backend `error.details.fields` mapped to form errors
+- Loading/disabled states on all mutations; duplicate submission guarded
+
+### Verification
+
+```bash
+cd src/frontend
+npm test        # 20 passed
+npm run build   # tsc + vite build success
 ```
 
 ---
@@ -95,3 +130,4 @@ Implement M5 — Frontend Core UI per ui-flow.md:
 |------|-----------|---------|
 | 2026-07-18 | M0 | Scaffold only |
 | 2026-07-20 | M1–M4 | Core backend complete, 40 tests passing |
+| 2026-07-22 | M5 | Core frontend complete, 20 frontend tests passing |

@@ -1,22 +1,25 @@
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+
+import AppLayout from './components/layout/AppLayout';
+import { ActingUserProvider } from './context/ActingUserContext';
+import TicketCreatePage from './pages/TicketCreatePage';
+import TicketDetailPage from './pages/TicketDetailPage';
+import TicketListPage from './pages/TicketListPage';
 import './App.css';
 
-/**
- * Scaffold placeholder — feature UI implemented in M5.
- * Acting-user selector and ticket views will be added per ui-flow.md.
- */
 export default function App() {
   return (
-    <div className="app">
-      <header className="app-header">
-        <h1>Support Ticket Management System</h1>
-        <p className="disclaimer">
-          Scaffold only. Acting-user context via <code>X-User-Id</code> — not
-          authentication.
-        </p>
-      </header>
-      <main>
-        <p>Implementation begins at milestone M1 (data layer).</p>
-      </main>
-    </div>
+    <ActingUserProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route element={<AppLayout />}>
+            <Route index element={<TicketListPage />} />
+            <Route path="tickets/new" element={<TicketCreatePage />} />
+            <Route path="tickets/:id" element={<TicketDetailPage />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </ActingUserProvider>
   );
 }

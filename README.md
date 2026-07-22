@@ -13,13 +13,15 @@ AI-assisted full-stack project for managing support tickets with comments, statu
 
 ## Acting-User Context (Not Authentication)
 
-The frontend will use a **seeded current-user selector**. The selected user's ID is sent via the `X-User-Id` header on endpoints that need acting-user context (ticket create, comment create, CSV export). This is **not** authentication.
+The frontend uses a **seeded current-user selector** (`ActingUserSelector`). The selected user's ID is stored in `localStorage` (`actingUserId`) and sent via the `X-User-Id` header on endpoints that need acting-user context (ticket create, comment create, CSV export). A visible disclaimer in the app header explains this is **not** authentication.
 
 ## API Base URL
 
 ```
 http://localhost:8000
 ```
+
+Configure the frontend with `VITE_API_BASE_URL` (defaults to `http://localhost:8000`).
 
 Interactive docs: `http://localhost:8000/docs`
 
@@ -39,6 +41,16 @@ python -m app.scripts.seed
 uvicorn app.main:app --reload --port 8000
 ```
 
+### Frontend
+
+```bash
+cd src/frontend
+npm install
+npm run dev
+```
+
+Open `http://localhost:5173` (Vite default). Ensure the backend is running on port 8000.
+
 ### Verify
 
 ```bash
@@ -48,20 +60,23 @@ curl "http://localhost:8000/api/tickets?page=1&pageSize=10"
 curl -H "X-User-Id: 1" http://localhost:8000/api/tickets/export.csv
 ```
 
-### Run Backend Tests
+### Run Tests
+
+**Backend** (from repo root):
 
 ```bash
-cd src/backend && source .venv/bin/activate && pytest ../../tests -v
+cd src/backend && source .venv/bin/activate
+pytest ../../tests -v
 ```
 
 65 tests use an isolated SQLite file per test (`tmp_path/pytest_tickets.db`) — production `data/tickets.db` is never touched.
 
-### Frontend (scaffold)
+**Frontend:**
 
 ```bash
 cd src/frontend
-npm install
-npm run dev
+npm test              # Vitest (20 tests)
+npm run build         # tsc --noEmit + vite build
 ```
 
 ## API Endpoints
@@ -83,9 +98,9 @@ Full specification: [api-contract.md](./api-contract.md)
 ## Repository Layout
 
 ```
-├── src/backend/          # FastAPI app (implemented)
-├── src/frontend/         # React app (scaffold)
-├── tests/                # Pytest (40 tests)
+├── src/backend/          # FastAPI app
+├── src/frontend/         # React + Vite app
+├── tests/                # Pytest (65 tests)
 ├── database/seed-data/   # Seed JSON files
 ├── data/tickets.db       # SQLite file (gitignored, created on migrate)
 └── api-contract.md       # API specification
@@ -99,7 +114,8 @@ Full specification: [api-contract.md](./api-contract.md)
 | Database + migrations | **Complete** |
 | Seed script | **Complete** |
 | Backend tests | **65 passing** |
-| Frontend UI | Scaffold only (M5) |
+| Frontend UI | **Complete** (Core) |
+| Frontend tests | **20 passing** |
 
 ## Documentation
 
@@ -109,11 +125,11 @@ Full specification: [api-contract.md](./api-contract.md)
 | [data-model.md](./data-model.md) | Database schema |
 | [database/setup-notes.md](./database/setup-notes.md) | DB setup instructions |
 | [design-notes.md](./design-notes.md) | Architecture |
-| [ui-flow.md](./ui-flow.md) | Frontend design (not yet implemented) |
+| [ui-flow.md](./ui-flow.md) | Frontend pages, components, and flows |
 
 ## Core vs Stretch
 
-**Core:** Ticket CRUD, comments, status state machine, search/filter/pagination, CSV export, backend validation.
+**Core:** Ticket CRUD, comments, status state machine, search/filter/pagination, CSV export, backend validation, React UI.
 
 **Stretch:** Real authentication, role-based UI, deployment automation.
 
