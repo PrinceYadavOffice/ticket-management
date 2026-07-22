@@ -41,8 +41,49 @@ export function setActingUserIdProvider(provider: () => number | null): void {
   actingUserIdProvider = provider;
 }
 
-export function getApiBaseUrl(): string {
-  return BASE_URL;
+function isApiErrorBody(data: unknown): data is ApiErrorBody {
+  return (
+    typeof data === 'object' &&
+    data !== null &&
+    'error' in data &&
+    typeof (data as ApiErrorBody).error?.message === 'string'
+  );
+}
+
+function toApiError(status: number, data: unknown): ApiError {
+  if (isApiErrorBody(data)) {
+    return new ApiError(status, data);
+  }
+  return new ApiError(status, {
+    error: {
+      code: 'UNKNOWN_ERROR',
+      message: 'Request failed',
+      details: {},
+    },
+  });
+}
+
+async function parseJsonBody(response: Response): Promise<unknown> {
+  const contentType = response.headers.get('content-type') ?? '';
+  if (contentType.includes('application/json') && typeof response.json === 'function') {
+    try {
+      return await response.json();
+    } catch {
+      throw toApiError(response.status, null);
+    }
+  }
+  if (typeof response.text !== 'function') {
+    return null;
+  }
+  const text = await response.text();
+  if (!text) {
+    return null;
+  }
+  try {
+    return JSON.parse(text);
+  } catch {
+    throw toApiError(response.status, null);
+  }
 }
 
 export async function apiRequest<T>(
@@ -97,9 +138,9 @@ export async function apiRequest<T>(
     return (await response.text()) as T;
   }
 
-  const data = await response.json();
+  const data = await parseJsonBody(response);
   if (!response.ok) {
-    throw new ApiError(response.status, data as ApiErrorBody);
+    throw toApiError(response.status, data);
   }
   return data as T;
 }
@@ -118,8 +159,8 @@ export async function apiDownload(
   }
 
   if (!response.ok) {
-    const data = await response.json();
-    throw new ApiError(response.status, data as ApiErrorBody);
+    const data = await parseJsonBody(response);
+    throw toApiError(response.status, data);
   }
 
   const disposition = response.headers.get('Content-Disposition') ?? '';

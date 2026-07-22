@@ -11,6 +11,7 @@ from sqlalchemy import func, select
 
 from app.core.config import settings
 from app.core.database import SessionLocal
+from app.core.enums import TicketPriority, TicketStatus
 from app.models import Comment, Ticket, User
 
 _REPO_ROOT = Path(__file__).resolve().parents[4]
@@ -54,12 +55,18 @@ def seed_tickets_and_comments(db, users: dict[str, User]) -> None:
             title_to_ticket[existing.title] = existing
             continue
         assignee = users.get(entry["assigned_to_email"]) if entry.get("assigned_to_email") else None
+        try:
+            priority = TicketPriority(entry["priority"]).value
+            status = TicketStatus(entry["status"]).value
+        except ValueError as exc:
+            print(f"Skipping ticket {entry['title']!r}: invalid priority/status — {exc}", file=sys.stderr)
+            continue
         now = datetime.now(timezone.utc)
         ticket = Ticket(
             title=entry["title"],
             description=entry["description"],
-            priority=entry["priority"],
-            status=entry["status"],
+            priority=priority,
+            status=status,
             assigned_to_user_id=assignee.id if assignee else None,
             created_by_user_id=creator.id,
             created_at=now,

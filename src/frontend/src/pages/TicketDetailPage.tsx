@@ -118,7 +118,10 @@ export default function TicketDetailPage() {
         setCommentError(err.message);
       } else if (err instanceof Error) {
         setCommentError(err.message);
+      } else {
+        setCommentError('Failed to post comment.');
       }
+      throw err;
     } finally {
       setCommentSubmitting(false);
     }

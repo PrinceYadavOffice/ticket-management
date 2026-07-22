@@ -1,4 +1,4 @@
-"""SQLAlchemy database session setup (models to be added in M1)."""
+"""SQLAlchemy database session setup."""
 
 from collections.abc import Generator
 
@@ -22,5 +22,8 @@ def get_db() -> Generator[Session, None, None]:
     db = SessionLocal()
     try:
         yield db
+    except Exception:
+        db.rollback()
+        raise
     finally:
         db.close()

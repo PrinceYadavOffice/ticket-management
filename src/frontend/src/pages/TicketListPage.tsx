@@ -42,6 +42,8 @@ export default function TicketListPage() {
       setTotal(data.total);
     } catch (err) {
       setError(err);
+      setTickets([]);
+      setTotal(0);
     } finally {
       setLoading(false);
     }

@@ -103,7 +103,7 @@ describe('TicketDetailPage', () => {
           json: async () => ({
             error: {
               code: 'INVALID_STATUS_TRANSITION',
-              message: 'Cannot transition from Open to Resolved',
+              message: "Cannot transition from 'Open' to 'In Progress'",
               details: {},
             },
           }),
@@ -120,7 +120,7 @@ describe('TicketDetailPage', () => {
 
     await waitFor(() => {
       expect(screen.getByRole('alert')).toHaveTextContent(
-        'Cannot transition from Open to Resolved',
+        "Cannot transition from 'Open' to 'In Progress'",
       );
     });
     expect(screen.getByText('Open', { selector: '.badge' })).toBeInTheDocument();

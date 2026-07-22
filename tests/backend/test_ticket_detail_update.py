@@ -60,3 +60,25 @@ class TestTicketDetailAndUpdate:
         )
         assert response.status_code == 200
         assert response.json()["assignedTo"] is None
+
+    def test_blank_title_on_patch_returns_422(self, client, sample_ticket):
+        response = client.patch(
+            f"/api/tickets/{sample_ticket.id}",
+            json={"title": "   "},
+        )
+        assert_error(response, 422, "VALIDATION_ERROR")
+
+    def test_invalid_priority_on_patch_returns_422(self, client, sample_ticket):
+        response = client.patch(
+            f"/api/tickets/{sample_ticket.id}",
+            json={"priority": "Urgent"},
+        )
+        assert_error(response, 422, "VALIDATION_ERROR")
+
+    def test_malformed_json_on_patch_returns_422(self, client, sample_ticket):
+        response = client.patch(
+            f"/api/tickets/{sample_ticket.id}",
+            content="{bad",
+            headers={"Content-Type": "application/json"},
+        )
+        assert_error(response, 422, "VALIDATION_ERROR")

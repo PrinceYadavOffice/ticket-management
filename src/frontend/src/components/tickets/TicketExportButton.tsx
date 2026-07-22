@@ -33,7 +33,7 @@ export default function TicketExportButton({ onError, onSuccess }: TicketExportB
       a.href = url;
       a.download = filename;
       a.click();
-      URL.revokeObjectURL(url);
+      window.setTimeout(() => URL.revokeObjectURL(url), 100);
       onSuccess?.('CSV export downloaded.');
     } catch (err) {
       onError(err);

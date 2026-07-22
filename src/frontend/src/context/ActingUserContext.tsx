@@ -44,13 +44,18 @@ export function ActingUserProvider({ children }: { children: ReactNode }) {
         const data = await fetchUsers();
         if (cancelled) return;
         setUsers(data);
-        const stored = readStoredUserId();
-        const validStored = stored != null && data.some((u) => u.id === stored);
-        const initialId = validStored ? stored : data[0]?.id ?? null;
-        setCurrentUserIdState(initialId);
-        if (initialId != null) {
-          localStorage.setItem(ACTING_USER_STORAGE_KEY, String(initialId));
-        }
+        setCurrentUserIdState((prev) => {
+          if (prev != null && data.some((u) => u.id === prev)) {
+            return prev;
+          }
+          const stored = readStoredUserId();
+          const validStored = stored != null && data.some((u) => u.id === stored);
+          const initialId = validStored ? stored : data[0]?.id ?? null;
+          if (initialId != null) {
+            localStorage.setItem(ACTING_USER_STORAGE_KEY, String(initialId));
+          }
+          return initialId;
+        });
       } catch (err) {
         if (!cancelled) {
           setError(err instanceof Error ? err.message : 'Failed to load users');

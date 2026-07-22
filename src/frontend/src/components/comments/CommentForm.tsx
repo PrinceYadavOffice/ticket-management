@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react';
 
 interface CommentFormProps {
-  onSubmit: (message: string) => void;
+  onSubmit: (message: string) => void | Promise<void>;
   submitting?: boolean;
   error?: string;
 }
@@ -9,20 +9,28 @@ interface CommentFormProps {
 export default function CommentForm({ onSubmit, submitting = false, error }: CommentFormProps) {
   const [message, setMessage] = useState('');
   const [clientError, setClientError] = useState('');
+  const errorId = 'comment-message-error';
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!message.trim()) {
       setClientError('Comment cannot be blank');
       return;
     }
     setClientError('');
-    onSubmit(message.trim());
-    setMessage('');
+    const trimmed = message.trim();
+    try {
+      await onSubmit(trimmed);
+      setMessage('');
+    } catch {
+      // Parent displays API errors; keep draft text for retry.
+    }
   };
 
+  const displayError = clientError || error;
+
   return (
-    <form className="comment-form" onSubmit={handleSubmit}>
+    <form className="comment-form" onSubmit={handleSubmit} noValidate>
       <label htmlFor="comment-message">
         Add comment
         <textarea
@@ -32,12 +40,13 @@ export default function CommentForm({ onSubmit, submitting = false, error }: Com
           maxLength={2000}
           required
           onChange={(e) => setMessage(e.target.value)}
-          aria-invalid={!!(clientError || error)}
+          aria-invalid={!!displayError}
+          aria-describedby={displayError ? errorId : undefined}
         />
       </label>
-      {(clientError || error) && (
-        <span className="field-error" role="alert">
-          {clientError || error}
+      {displayError && (
+        <span id={errorId} className="field-error" role="alert">
+          {displayError}
         </span>
       )}
       <button type="submit" className="btn btn-primary" disabled={submitting}>
